@@ -251,7 +251,7 @@ class upload extends SB_Controller {
 		$info['extension']=strtolower($info['extension']);
 		$data['file_ext'] = $info['extension']?$info['extension']:'';
 		//新文件名
-		$data['new_file_name'] = date("YmdHis") . '_' . rand(1, 99999) . '.' . $data['file_ext'];
+		$data['new_file_name'] = basename($info['basename'], '.' . $info['extension']) . '_' . date("YmdHis") . '_' . rand(1, 99999) . '.' . $data['file_ext'];
 		$data['folder']=in_array($data['file_ext'],$ext_arr['image'])?'image':(in_array($data['file_ext'],$ext_arr['media'])?'media':'file');
 		$data['file_path']='uploads/'.$data['folder'].'/'.date("Ym").'/';
 		$data['file_path_url']=$data['file_path'].$data['new_file_name'];
