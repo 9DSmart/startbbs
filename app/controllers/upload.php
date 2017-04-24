@@ -158,7 +158,6 @@ class upload extends SB_Controller {
 			$data['error'] = $this->upload->display_errors('<p>', '</p>');
 			echo json_encode($data);
 		} else {
-			
 			$upload_data = $this->upload->data();
 			
             $data['status'] = 'success';
@@ -167,7 +166,7 @@ class upload extends SB_Controller {
             $data['file_url']  = $path.$upload_data['file_name'];
            
 			$config = array(
-				'source_image' => $upload_data['full_path'],
+				'source_image' => iconv("UTF-8", "GB2312", $upload_data['full_path']),
 				'maintain_ration' => true,
 			);
 			//图片缩放
@@ -188,15 +187,10 @@ class upload extends SB_Controller {
 			exit(json_encode($data));
 			
 		}
-
 		//}
-		
-		
 	}
 	
 	function get_images() {
-		
-		
 		//return $images;
 	}
 
@@ -247,16 +241,25 @@ class upload extends SB_Controller {
 			'file' => array('doc', 'docx', 'xls', 'xlsx', 'ppt', 'txt', 'zip', 'rar', 'gz', 'bz2'),
 		);
 		//获得文件扩展名
-		$info = pathinfo($file);
+		// $info = pathinfo($file);
+		$info = $this->path_info($file);
 		$info['extension']=strtolower($info['extension']);
 		$data['file_ext'] = $info['extension']?$info['extension']:'';
 		//新文件名
-		$data['new_file_name'] = basename($info['basename'], '.' . $info['extension']) . '_' . date("YmdHis") . '_' . rand(1, 99999) . '.' . $data['file_ext'];
+		$data['new_file_name'] = $info['filename'] . '_' . date("YmdHis") . '_' . rand(1, 99999) . '.' . $data['file_ext'];
 		$data['folder']=in_array($data['file_ext'],$ext_arr['image'])?'image':(in_array($data['file_ext'],$ext_arr['media'])?'media':'file');
 		$data['file_path']='uploads/'.$data['folder'].'/'.date("Ym").'/';
 		$data['file_path_url']=$data['file_path'].$data['new_file_name'];
 		return $data;
 	}
 
+    function path_info($filepath) {
+        $path_parts = array();
+        $path_parts ['dirname'] = rtrim(substr($filepath, 0, strrpos($filepath, '/')), "/") . "/";
+        $path_parts ['basename'] = ltrim(substr($filepath, strrpos($filepath, '/')), "/");
+        $path_parts ['extension'] = substr(strrchr($filepath, '.'), 1);
+        $path_parts ['filename'] = ltrim(substr($path_parts ['basename'], 0, strrpos($path_parts ['basename'], '.')), "/");
+        return $path_parts;
+    }
 
 }
